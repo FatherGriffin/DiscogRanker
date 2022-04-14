@@ -21,6 +21,10 @@ class discog:
             #instantiates window & pulls up Spotify
         self.options = webdriver.ChromeOptions()
         self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        
+            #runs selenium in the background / delete this line to make a physical window appear
+        #self.options.add_argument("headless")
+        
         self.driver = webdriver.Chrome(service=self.s, options=self.options)
         #self.driver.maximize_window()
         self.driver.get("https://accounts.spotify.com/en/login")
@@ -51,26 +55,29 @@ class discog:
             #brings up search bar
         self.driver.get("https://open.spotify.com/search")
         
-        time.sleep(0.5)
+        time.sleep(2)
         
             #types in artist name
         xp5 = '//*[@id="main"]/div/div[2]/div[1]/header/div[3]/div/div/form/input'
         self.artist_search = self.driver.find_element_by_xpath(xp5)
         self.artist_search.send_keys(self.artist)
         
-        time.sleep(2)
+        time.sleep(1)
         
             #brings up artist profile
         xp6 = '//*[@id="searchPage"]/div/div/section[1]/div[2]'
         self.albums = self.driver.find_element_by_xpath(xp6)
         self.albums.click()
+        print('artist profile')
         
         time.sleep(1)
         
             #brings up artist discography
         xp7 = '//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/section/div/div[2]/div[3]/section[2]/div[1]/div/a'
-        self.albums = self.driver.find_element_by_xpath(xp7)
-        self.albums.click()
+        self.albums_hyperlink = self.driver.find_element_by_xpath(xp7).get_attribute("href")
+        self.driver.get(self.albums_hyperlink)
+        
+        print('finished')
         
         
     def close_window(self):
@@ -86,6 +93,7 @@ password = '$Cornelius632'
 #print("\nYou entered: " + artist_name)
 
 #instantiates user specified discography
-d1 = discog(user, password, 'Chance the Rapper')  
+d1 = discog(user, password, 'Lil Tecca')  
 d1.spotify_login()
 d1.search()
+
