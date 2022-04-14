@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
+import threading
+
 class discog:
     
     def __init__(self, s_user, s_pass, artist):
@@ -49,6 +51,8 @@ class discog:
         xp4 = '/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/button[2]'
         self.login_click = self.driver.find_elements_by_xpath(xp4)[0]
         self.login_click.click()
+
+        print('redirected to web player')
         
     def search(self):
 
@@ -61,6 +65,8 @@ class discog:
         xp5 = '//*[@id="main"]/div/div[2]/div[1]/header/div[3]/div/div/form/input'
         self.artist_search = self.driver.find_element_by_xpath(xp5)
         self.artist_search.send_keys(self.artist)
+
+        print('artist name typed')
         
         time.sleep(1)
         
@@ -68,21 +74,18 @@ class discog:
         xp6 = '//*[@id="searchPage"]/div/div/section[1]/div[2]'
         self.albums = self.driver.find_element_by_xpath(xp6)
         self.albums.click()
-        print('artist profile')
+
+        print('artist profile located')
         
-        time.sleep(1)
+        time.sleep(2)
         
             #brings up artist discography
         xp7 = '//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/section/div/div[2]/div[3]/section[2]/div[1]/div/a'
         self.albums_hyperlink = self.driver.find_element_by_xpath(xp7).get_attribute("href")
         self.driver.get(self.albums_hyperlink)
-        
-        print('finished')
-        
-        
-    def close_window(self):
 
-            #terminates chrome window
+        print('finished!')
+        
         self.driver.close()
     
 
@@ -93,7 +96,7 @@ password = '$Cornelius632'
 #print("\nYou entered: " + artist_name)
 
 #instantiates user specified discography
-d1 = discog(user, password, 'Lil Tecca')  
-d1.spotify_login()
-d1.search()
+#d1 = discog(user, password, 'Lil Tecca')  
+#d1.spotify_login()
+#d1.search()
 
