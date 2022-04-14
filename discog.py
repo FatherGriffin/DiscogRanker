@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 
 class discog:
     
-    def __init__(self, s_user, s_pass, artist=''):
+    def __init__(self, s_user, s_pass, artist):
 
         self.var = 1
         self.user = s_user
@@ -16,35 +16,76 @@ class discog:
         self.PATH = "C:\Program Files (x86)\chromedriver.exe"
         self.s = Service(self.PATH)
 
-    def search(self):
+    def spotify_login(self):
         
             #instantiates window & pulls up Spotify
         self.options = webdriver.ChromeOptions()
         self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.driver = webdriver.Chrome(service=self.s, options=self.options)
-        self.driver.maximize_window()
+        #self.driver.maximize_window()
         self.driver.get("https://accounts.spotify.com/en/login")
 
-            #enters login information
-        xp = '//*[@id="login-username"]'
-        self.login_button = self.driver.find_elements_by_xpath(xp)[0]
-        self.login_button.send_keys(self.user)
-    
+            #enters user
+        xp1 = '//*[@id="login-username"]'
+        self.login_user = self.driver.find_elements_by_xpath(xp1)[0]
+        self.login_user.send_keys(self.user)
+            #enters password
+        xp2 = '//*[@id="login-password"]'
+        self.login_pass = self.driver.find_elements_by_xpath(xp2)[0]
+        self.login_pass.send_keys(self.password)
+            #click login button
+        xp3 = '//*[@id="login-button"]'
+        self.login_click = self.driver.find_elements_by_xpath(xp3)[0]
+        self.login_click.click()
+        
+        print('Successful Login')
+        time.sleep(0.5)
+        
+            #redirects to spotify website
+        xp4 = '/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/button[2]'
+        self.login_click = self.driver.find_elements_by_xpath(xp4)[0]
+        self.login_click.click()
+        
+    def search(self):
+
+            #brings up search bar
+        self.driver.get("https://open.spotify.com/search")
+        
+        time.sleep(0.5)
+        
+            #types in artist name
+        xp5 = '//*[@id="main"]/div/div[2]/div[1]/header/div[3]/div/div/form/input'
+        self.artist_search = self.driver.find_element_by_xpath(xp5)
+        self.artist_search.send_keys(self.artist)
+        
+        time.sleep(2)
+        
+            #brings up artist profile
+        xp6 = '//*[@id="searchPage"]/div/div/section[1]/div[2]'
+        self.albums = self.driver.find_element_by_xpath(xp6)
+        self.albums.click()
+        
+        time.sleep(1)
+        
+            #brings up artist discography
+        xp7 = '//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/section/div/div[2]/div[3]/section[2]/div[1]/div/a'
+        self.albums = self.driver.find_element_by_xpath(xp7)
+        self.albums.click()
+        
+        
     def close_window(self):
 
             #terminates chrome window
         self.driver.close()
-        
+    
 
-#PATH = "C:\Program Files (x86)\chromedriver.exe"
-#s = Service(PATH)
+user = 'griffinbrooks47@gmail.com'
+password = '$Cornelius632'
 
-#options = webdriver.ChromeOptions()
-#options.add_experimental_option('excludeSwitches', ['enable-logging'])
-#driver = webdriver.Chrome(service=s, options=options)
+#artist_name = input("\nWhat artist discography do you want to use? ")
+#print("\nYou entered: " + artist_name)
 
-#driver.maximize_window()
-
-#driver.get("https://www.spotify.com/us/")
-
-
+#instantiates user specified discography
+d1 = discog(user, password, 'Chance the Rapper')  
+d1.spotify_login()
+d1.search()
