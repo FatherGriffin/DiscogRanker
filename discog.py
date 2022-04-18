@@ -3,94 +3,69 @@ from typing import KeysView
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 import threading
 
 class discog:
     
-    def __init__(self, s_user, s_pass, artist):
-
-        self.var = 1
-        self.user = s_user
-        self.password = s_pass
+    def __init__(self, artist):
+        
         self.artist = artist
+        self.artist_keyword = '' + artist + ' spotify'
+        self.artist_urn = None
+        
+        self.albums = []
+        self.album_uris = []
+        self.track_list = {}
+        self.album_covers = []
 
         self.PATH = "C:\Program Files (x86)\chromedriver.exe"
         self.s = Service(self.PATH)
+        
+        self.artist_keyword = self.artist_keyword.replace(' ', '+')
 
-    def spotify_login(self):
+    def pull_catalogue(self):
         
             #instantiates window & pulls up Spotify
         self.options = webdriver.ChromeOptions()
         self.options.add_experimental_option('excludeSwitches', ['enable-logging'])
         
             #runs selenium in the background / delete this line to make a physical window appear
-        #self.options.add_argument("headless")
+        self.options.add_argument("headless")
         
         self.driver = webdriver.Chrome(service=self.s, options=self.options)
         #self.driver.maximize_window()
-        self.driver.get("https://accounts.spotify.com/en/login")
-
-            #enters user
-        xp1 = '//*[@id="login-username"]'
-        self.login_user = self.driver.find_elements_by_xpath(xp1)[0]
-        self.login_user.send_keys(self.user)
-            #enters password
-        xp2 = '//*[@id="login-password"]'
-        self.login_pass = self.driver.find_elements_by_xpath(xp2)[0]
-        self.login_pass.send_keys(self.password)
-            #click login button
-        xp3 = '//*[@id="login-button"]'
-        self.login_click = self.driver.find_elements_by_xpath(xp3)[0]
-        self.login_click.click()
         
-        print('Successful Login')
-        time.sleep(0.5)
-        
-            #redirects to spotify website
-        xp4 = '/html[1]/body[1]/div[1]/div[1]/div[2]/div[1]/div[1]/button[2]'
-        self.login_click = self.driver.find_elements_by_xpath(xp4)[0]
-        self.login_click.click()
-
-        print('redirected to web player')
-        
-    def search(self):
-
-            #brings up search bar
-        self.driver.get("https://open.spotify.com/search")
-        
-        time.sleep(2)
-        
-            #types in artist name
-        xp5 = '//*[@id="main"]/div/div[2]/div[1]/header/div[3]/div/div/form/input'
-        self.artist_search = self.driver.find_element_by_xpath(xp5)
-        self.artist_search.send_keys(self.artist)
-
-        print('artist name typed')
+        for i in range (1):
+            self.driver.get("https://www.google.com/search?q=" + self.artist_keyword + '&start' + str(i))
         
         time.sleep(1)
         
-            #brings up artist profile
-        xp6 = '//*[@id="searchPage"]/div/div/section[1]/div[2]'
-        self.albums = self.driver.find_element_by_xpath(xp6)
-        self.albums.click()
-
-        print('artist profile located')
+        xp1 = '//a[@href]'
+        self.hyperlinks = self.driver.find_elements_by_xpath(xp1)
         
-        time.sleep(2)
         
-            #brings up artist discography
-        xp7 = '//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/section/div/div[2]/div[3]/section[2]/div[1]/div/a'
-        self.albums_hyperlink = self.driver.find_element_by_xpath(xp7).get_attribute("href")
-        self.driver.get(self.albums_hyperlink)
+        for link in self.hyperlinks:
 
-        print('finished!')
+            if link.get_attribute("href")[0:31] == 'https://open.spotify.com/artist':
+                self.artist_urn = link.get_attribute("href").replace(
+                    'https://open.spotify.com/artist/', ''
+                    )
+                break
         
         self.driver.close()
+        
+        return self.artist_urn
     
+    def add_album(self, title, uri, cover):
+        self.albums.append(title)
+        self.album_uris.append(uri)
+        self.album_covers.append(cover)
+    
+    def add_tracklist(self, title, tracklist):
+        self.track_list.update({title: tracklist})
 
-user = 'griffinbrooks47@gmail.com'
-password = '$Cornelius632'
 
 #artist_name = input("\nWhat artist discography do you want to use? ")
 #print("\nYou entered: " + artist_name)
